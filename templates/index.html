@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Insights Dashboard</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-indigo-900 text-white shadow-lg hidden md:block">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold mb-1">Insights</h1>
+                <p class="text-indigo-200 text-sm">Global Analytics Dashboard</p>
+            </div>
+            <div class="px-4 py-2">
+                <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wide mb-2">Filters</p>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-indigo-200 mb-1">Sector</label>
+                    <select id="sector-filter" class="w-full bg-indigo-800 text-white rounded-md border-indigo-700 focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                        <option value="">All Sectors</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-indigo-200 mb-1">Topic</label>
+                    <select id="topic-filter" class="w-full bg-indigo-800 text-white rounded-md border-indigo-700 focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                        <option value="">All Topics</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-indigo-200 mb-1">Region</label>
+                    <select id="region-filter" class="w-full bg-indigo-800 text-white rounded-md border-indigo-700 focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                        <option value="">All Regions</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-indigo-200 mb-1">PESTLE Factor</label>
+                    <select id="pestle-filter" class="w-full bg-indigo-800 text-white rounded-md border-indigo-700 focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                        <option value="">All Factors</option>
+                    </select>
+                </div>
+                
+                <button id="reset-filters" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                    Reset Filters
+                </button>
+            </div>
+            
+            <div class="mt-8 px-6">
+                <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wide mb-4">About</p>
+                <p class="text-indigo-200 text-sm">
+                    This dashboard visualizes global trend insights across various sectors and regions.
+                </p>
+                <div class="mt-4 text-indigo-200 text-sm">
+                    <p class="flex items-center">
+                        <i class="fas fa-database mr-2"></i> <span id="data-count">0</span> insights
+                    </p>
+                    <p class="flex items-center mt-1">
+                        <i class="fas fa-calendar mr-2"></i> Last updated: <span id="last-updated">-</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile filter button -->
+        <div class="fixed bottom-4 right-4 md:hidden z-20">
+            <button id="mobile-filter-button" class="p-4 bg-indigo-600 rounded-full text-white shadow-lg">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile filter panel -->
+        <div id="mobile-filter-panel" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-10 hidden md:hidden">
+            <div class="absolute inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">Filters</h3>
+                    <button id="close-filter-panel" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sector</label>
+                    <select id="mobile-sector-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="">All Sectors</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Topic</label>
+                    <select id="mobile-topic-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="">All Topics</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                    <select id="mobile-region-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="">All Regions</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">PESTLE Factor</label>
+                    <select id="mobile-pestle-filter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="">All Factors</option>
+                    </select>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button id="apply-mobile-filters" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                        Apply
+                    </button>
+                    <button id="reset-mobile-filters" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Navigation -->
+            <div class="bg-white shadow-sm border-b">
+                <div class="flex justify-between items-center px-6 py-3">
+                    <h1 class="text-xl font-bold text-gray-800 md:hidden">Insights Dashboard</h1>
+                    <div class="text-gray-600">
+                        <span class="mr-2"><i class="far fa-calendar-alt"></i> <span id="current-date">Mar 21, 2025</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Summary Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transform transition-all hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-indigo-100 text-indigo-600">
+                                <i class="fas fa-globe fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider">Total Insights</p>
+                                <p id="total-insights" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transform transition-all hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-industry fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider">Top Sector</p>
+                                <p id="top-sector" class="text-2xl font-bold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transform transition-all hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-lightbulb fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider">Top Topic</p>
+                                <p id="top-topic" class="text-2xl font-bold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transform transition-all hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i class="fas fa-exclamation-triangle fa-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider">High Impact</p>
+                                <p id="high-impact" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- View Switcher -->
+                <div class="mb-6">
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button id="view-charts" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 rounded-l-lg border border-indigo-600 hover:bg-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-500 focus:text-white">
+                            <i class="fas fa-chart-pie mr-2"></i> Charts
+                        </button>
+                        <button id="view-table" class="py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-r-lg border border-gray-200 hover:bg-gray-100 hover:text-indigo-700 focus:z-10 focus:ring-2 focus:ring-indigo-500 focus:text-indigo-700">
+                            <i class="fas fa-table mr-2"></i> Table
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Charts View -->
+                <div id="charts-container">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-semibold text-gray-800">Insights by Sector</h2>
+                                <div class="text-gray-500 text-sm">
+                                    <i class="fas fa-info-circle" title="Distribution of insights across sectors"></i>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="sector-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-semibold text-gray-800">PESTLE Analysis</h2>
+                                <div class="text-gray-500 text-sm">
+                                    <i class="fas fa-info-circle" title="Distribution across PESTLE factors"></i>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="pestle-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-semibold text-gray-800">Intensity vs. Likelihood</h2>
+                                <div class="text-gray-500 text-sm">
+                                    <i class="fas fa-info-circle" title="Relationship between intensity and likelihood"></i>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="scatter-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-lg font-semibold text-gray-800">Insights Timeline</h2>
+                                <div class="text-gray-500 text-sm">
+                                    <i class="fas fa-info-circle" title="Publication trend over time"></i>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="timeline-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table View -->
+                <div id="table-container" class="hidden">
+                    <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-800">Insights Data</h3>
+                                <div class="relative max-w-xs w-full">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                    <input id="table-search" type="text" class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Search...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="title">
+                                            Title <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="sector">
+                                            Sector <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="topic">
+                                            Topic <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="intensity">
+                                            Intensity <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="likelihood">
+                                            Likelihood <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="region">
+                                            Region <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="published">
+                                            Published <i class="fas fa-sort ml-1"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="insights-table" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p id="pagination-info" class="text-sm text-gray-700">
+                                        Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">0</span> results
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <select id="items-per-page" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                                        <option value="10">10 / page</option>
+                                        <option value="25">25 / page</option>
+                                        <option value="50">50 / page</option>
+                                        <option value="100">100 / page</option>
+                                    </select>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <button id="prev-page" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Previous</span>
+                                            <i class="fas fa-chevron-left text-xs"></i>
+                                        </button>
+                                        <div id="page-numbers" class="flex">
+                                            <!-- Page numbers will be populated here -->
+                                        </div>
+                                        <button id="next-page" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                            <span class="sr-only">Next</span>
+                                            <i class="fas fa-chevron-right text-xs"></i>
+                                        </button>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let sectorChart, pestleChart, scatterChart, timelineChart;
+        let currentSort = { field: 'published', direction: 'desc' };
+        let searchTerm = '';
+
+        // Set current date
+        document.getElementById('current-date').textContent = moment().format('MMM D, YYYY');
+
+        // Fetch data when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                allData = data;
+                filteredData = [...allData];
+                
+                // Initialize the dashboard
+                populateFilters();
+                updateDashboard();
+                initializeCharts();
+                setLastUpdated();
+                
+                // Add event listeners
+                setupEventListeners();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+
+        function setLastUpdated() {
+            // Find the most recent published date
+            let lastDate = null;
+            allData.forEach(item => {
+                if (item.published) {
+                    const publishedDate = new Date(item.published);
+                    if (!lastDate || publishedDate > lastDate) {
+                        lastDate = publishedDate;
+                    }
+                }
+            });
+            
+            document.getElementById('last-updated').textContent = lastDate ? moment(lastDate).format('MMM D, YYYY') : '-';
+            document.getElementById('data-count').textContent = allData.length;
+        }
+
+        function setupEventListeners() {
+            // Filters
+            document.getElementById('sector-filter').addEventListener('change', applyDesktopFilters);
+            document.getElementById('topic-filter').addEventListener('change', applyDesktopFilters);
+            document.getElementById('region-filter').addEventListener('change', applyDesktopFilters);
+            document.getElementById('pestle-filter').addEventListener('change', applyDesktopFilters);
+            document.getElementById('reset-filters').addEventListener('click', resetDesktopFilters);
+            
+            // Mobile filters
+            document.getElementById('mobile-filter-button').addEventListener('click', showMobileFilterPanel);
+            document.getElementById('close-filter-panel').addEventListener('click', hideMobileFilterPanel);
+            document.getElementById('apply-mobile-filters').addEventListener('click', applyMobileFilters);
+            document.getElementById('reset-mobile-filters').addEventListener('click', resetMobileFilters);
+            
+            // View switcher
+            document.getElementById('view-charts').addEventListener('click', showChartsView);
+            document.getElementById('view-table').addEventListener('click', showTableView);
+            
+            // Pagination
+            document.getElementById('prev-page').addEventListener('click', () => changePage(currentPage - 1));
+            document.getElementById('next-page').addEventListener('click', () => changePage(currentPage + 1));
+            document.getElementById('items-per-page').addEventListener('change', changeItemsPerPage);
+            
+            // Table sorting
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => sortTable(th.getAttribute('data-sort')));
+            });
+            
+            // Table search
+            document.getElementById('table-search').addEventListener('input', searchTable);
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            const sectors = new Set();
+            const topics = new Set();
+            const regions = new Set();
+            const pestles = new Set();
+            
+            allData.forEach(item => {
+                if (item.sector) sectors.add(item.sector);
+                if (item.topic) topics.add(item.topic);
+                if (item.region) regions.add(item.region);
+                if (item.pestle) pestles.add(item.pestle);
+            });
+            
+            populateSelect('sector-filter', [...sectors].sort());
+            populateSelect('topic-filter', [...topics].sort());
+            populateSelect('region-filter', [...regions].sort());
+            populateSelect('pestle-filter', [...pestles].sort());
+            
+            // Also populate mobile filters
+            populateSelect('mobile-sector-filter', [...sectors].sort());
+            populateSelect('mobile-topic-filter', [...topics].sort());
+            populateSelect('mobile-region-filter', [...regions].sort());
+            populateSelect('mobile-pestle-filter', [...pestles].sort());
+        }
+        
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+        }
+        
+        // Filter handlers
+        function applyDesktopFilters() {
+            const sector = document.getElementById('sector-filter').value;
+            const topic = document.getElementById('topic-filter').value;
+            const region = document.getElementById('region-filter').value;
+            const pestle = document.getElementById('pestle-filter').value;
+            
+            applyFilters(sector, topic, region, pestle);
+        }
+        
+        function resetDesktopFilters() {
+            document.getElementById('sector-filter').value = '';
+            document.getElementById('topic-filter').value = '';
+            document.getElementById('region-filter').value = '';
+            document.getElementById('pestle-filter').value = '';
+            
+            applyDesktopFilters();
+        }
+        
+        function showMobileFilterPanel() {
+            document.getElementById('mobile-filter-panel').classList.remove('hidden');
+            
+            // Sync with desktop filters
+            document.getElementById('mobile-sector-filter').value = document.getElementById('sector-filter').value;
+            document.getElementById('mobile-topic-filter').value = document.getElementById('topic-filter').value;
+            document.getElementById('mobile-region-filter').value = document.getElementById('region-filter').value;
+            document.getElementById('mobile-pestle-filter').value = document.getElementById('pestle-filter').value;
+        }
+        
+        function hideMobileFilterPanel() {
+            document.getElementById('mobile-filter-panel').classList.add('hidden');
+        }
+        
+        function applyMobileFilters() {
+            const sector = document.getElementById('mobile-sector-filter').value;
+            const topic = document.getElementById('mobile-topic-filter').value;
+            const region = document.getElementById('mobile-region-filter').value;
+            const pestle = document.getElementById('mobile-pestle-filter').value;
+            
+            // Sync with desktop filters
+            document.getElementById('sector-filter').value = sector;
+            document.getElementById('topic-filter').value = topic;
+            document.getElementById('region-filter').value = region;
+            document.getElementById('pestle-filter').value = pestle;
+            
+            applyFilters(sector, topic, region, pestle);
+            hideMobileFilterPanel();
+        }
+        
+        function resetMobileFilters() {
+            document.getElementById('mobile-sector-filter').value = '';
+            document.getElementById('mobile-topic-filter').value = '';
+            document.getElementById('mobile-region-filter').value = '';
+            document.getElementById('mobile-pestle-filter').value = '';
+        }
+        
+        function applyFilters(sector, topic, region, pestle) {
+            filteredData = allData.filter(item => {
+                return (!sector || item.sector === sector) && 
+                       (!topic || item.topic === topic) && 
+                       (!region || item.region === region) && 
+                       (!pestle || item.pestle === pestle);
+            });
+            
+            // Apply search if active
+            if (searchTerm) {
+                filteredData = filteredData.filter(item => 
+                    (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (item.insight && item.insight.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (item.sector && item.sector.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    (item.topic && item.topic.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+            }
+            
+            // Apply current sorting
+            sortFilteredData();
+            
+            currentPage = 1;
+            updateDashboard();
+            updateCharts();
+        }
+        
+        // View switchers
+        function showChartsView() {
+            document.getElementById('charts-container').classList.remove('hidden');
+            document.getElementById('table-container').classList.add('hidden');
+            document.getElementById('view-charts').classList.remove('bg-white', 'text-gray-900');
+            document.getElementById('view-charts').classList.add('bg-indigo-600', 'text-white');
+            document.getElementById('view-table').classList.remove('bg-indigo-600', 'text-white');
+            document.getElementById('view-table').classList.add('bg-white', 'text-gray-900');
+        }
+        
+        function showTableView() {
+            document.getElementById('charts-container').classList.add('hidden');
+            document.getElementById('table-container').classList.remove('hidden');
+            document.getElementById('view-charts').classList.remove('bg-indigo-600', 'text-white');
+            document.getElementById('view-charts').classList.add('bg-white', 'text-gray-900');
+            document.getElementById('view-table').classList.add('bg-indigo-600', 'text-white');
+            document.getElementById('view-charts').classList.remove('text-white', 'bg-indigo-600');
+            document.getElementById('view-charts').classList.add('bg-white', 'text-gray-900');
+            
+            renderTable();
+        }
+        
+        // Update dashboard elements
+        function updateDashboard() {
+            // Update summary stats
+            document.getElementById('total-insights').textContent = filteredData.length;
+            
+            // Find top sector
+            const sectors = {};
+            filteredData.forEach(item => {
+                if (item.sector) {
+                    sectors[item.sector] = (sectors[item.sector] || 0) + 1;
+                }
+            });
+            let topSector = '-';
+            let maxSectorCount = 0;
+            Object.entries(sectors).forEach(([sector, count]) => {
+                if (count > maxSectorCount) {
+                    maxSectorCount = count;
+                    topSector = sector;
+                }
+            });
+            document.getElementById('top-sector').textContent = topSector;
+            
+            // Find top topic
+            const topics = {};
+            filteredData.forEach(item => {
+                if (item.topic) {
+                    topics[item.topic] = (topics[item.topic] || 0) + 1;
+                }
+            });
+            let topTopic = '-';
+            let maxTopicCount = 0;
+            Object.entries(topics).forEach(([topic, count]) => {
+                if (count > maxTopicCount) {
+                    maxTopicCount = count;
+                    topTopic = topic;
+                }
+            });
+            document.getElementById('top-topic').textContent = topTopic;
+            
+            // Count high impact items (intensity > 6)
+            const highImpactCount = filteredData.filter(item => item.intensity && item.intensity > 6).length;
+            document.getElementById('high-impact').textContent = highImpactCount;
+            
+            // Update table
+            renderTable();
+        }
+        
+        // Table rendering
+        function renderTable() {
+            const tableBody = document.getElementById('insights-table');
+            tableBody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const item = filteredData[i];
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                
+                // Title cell with tooltip for insight
+                const titleCell = document.createElement('td');
+                titleCell.className = 'px-6 py-4 whitespace-nowrap';
+                if (item.insight) {
+                    titleCell.setAttribute('title', item.insight);
+                }
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'flex items-center';
+                const titleText = document.createElement('div');
+                titleText.className = 'text-sm font-medium text-gray-900';
+                titleText.textContent = item.title || '-';
+                titleDiv.appendChild(titleText);
+                titleCell.appendChild(titleDiv);
+                row.appendChild(titleCell);
+                
+                // Sector cell
+                const sectorCell = document.createElement('td');
+                sectorCell.className = 'px-6 py-4 whitespace-nowrap';
+                const sectorText = document.createElement('div');
+                sectorText.className = 'text-sm text-gray-900';
+                sectorText.textContent = item.sector || '-';
+                sectorCell.appendChild(sectorText);
+                row.appendChild(sectorCell);
+                
+                // Topic cell
+                const topicCell = document.createElement('td');
+                topicCell.className = 'px-6 py-4 whitespace-nowrap';
+                const topicText = document.createElement('div');
+                topicText.className = 'text-sm text-gray-900';
+                topicText.textContent = item.topic || '-';
+                topicCell.appendChild(topicText);
+                row.appendChild(topicCell);
+                
+                // Intensity cell
+                const intensityCell = document.createElement('td');
+                intensityCell.className = 'px-6 py-4 whitespace-nowrap';
+                let intensityClass = 'text-sm text-gray-900';
+                if (item.intensity) {
+                    if (item.intensity > 6) {
+                        intensityClass += ' font-medium text-red-600';
+                    } else if (item.intensity > 3) {
+                        intensityClass += ' text-yellow-600';
+                    }
+                }
+                const intensityText = document.createElement('div');
+                intensityText.className = intensityClass;
+                intensityText.textContent = item.intensity || '-';
+                intensityCell.appendChild(intensityText);
+                row.appendChild(intensityCell);
+                
+                // Likelihood cell
+                const likelihoodCell = document.createElement('td');
+                likelihoodCell.className = 'px-6 py-4 whitespace-nowrap';
+                const likelihoodText = document.createElement('div');
+                likelihoodText.className = 'text-sm text-gray-900';
+                likelihoodText.textContent = item.likelihood || '-';
+                likelihoodCell.appendChild(likelihoodText);
+                row.appendChild(likelihoodCell);
+                
+                // Region cell
+                const regionCell = document.createElement('td');
+                regionCell.className = 'px-6 py-4 whitespace-nowrap';
+                const regionText = document.createElement('div');
+                regionText.className = 'text-sm text-gray-900';
+                regionText.textContent = item.region || '-';
+                regionCell.appendChild(regionText);
+                row.appendChild(regionCell);
+                
+                // Published date cell
+                const publishedCell = document.createElement('td');
+                publishedCell.className = 'px-6 py-4 whitespace-nowrap';
+                const publishedText = document.createElement('div');
+                publishedText.className = 'text-sm text-gray-900';
+                publishedText.textContent = item.published ? moment(item.published).format('MMM D, YYYY') : '-';
+                publishedCell.appendChild(publishedText);
+                row.appendChild(publishedCell);
+                
+                tableBody.appendChild(row);
+            }
+            
+            // Update pagination
+            updatePagination();
+        }
+        
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const pageNumbersContainer = document.getElementById('page-numbers');
+            pageNumbersContainer.innerHTML = '';
+            
+            // Update pagination info text
+            const startItem = Math.min(filteredData.length, (currentPage - 1) * itemsPerPage + 1);
+            const endItem = Math.min(filteredData.length, currentPage * itemsPerPage);
+            document.getElementById('pagination-info').innerHTML = `
+                Showing <span class="font-medium">${startItem}</span> to <span class="font-medium">${endItem}</span> 
+                of <span class="font-medium">${filteredData.length}</span> results
+            `;
+            
+            // Disable prev/next buttons if needed
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+            document.getElementById('prev-page').classList.toggle('opacity-50', currentPage === 1);
+            document.getElementById('next-page').classList.toggle('opacity-50', currentPage === totalPages);
+            
+            // Generate page number buttons
+            const maxPageButtons = 5; // Maximum page buttons to show
+            let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+            
+            // Adjust startPage if we're near the end
+            if (endPage - startPage + 1 < maxPageButtons && endPage < totalPages) {
+                startPage = Math.max(1, endPage - maxPageButtons + 1);
+            }
+            
+            // Add first page button if needed
+            if (startPage > 1) {
+                const firstPageBtn = createPageButton(1, currentPage === 1);
+                pageNumbersContainer.appendChild(firstPageBtn);
+                
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700';
+                    ellipsis.textContent = '...';
+                    pageNumbersContainer.appendChild(ellipsis);
+                }
+            }
+            
+            // Add page number buttons
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = createPageButton(i, currentPage === i);
+                pageNumbersContainer.appendChild(pageBtn);
+            }
+            
+            // Add last page button if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700';
+                    ellipsis.textContent = '...';
+                    pageNumbersContainer.appendChild(ellipsis);
+                }
+                
+                const lastPageBtn = createPageButton(totalPages, currentPage === totalPages);
+                pageNumbersContainer.appendChild(lastPageBtn);
+            }
+        }
+        
+        function createPageButton(pageNum, isActive) {
+            const btn = document.createElement('button');
+            let className = 'relative inline-flex items-center px-4 py-2 border text-sm font-medium';
+            
+            if (isActive) {
+                className += ' z-10 bg-indigo-50 border-indigo-500 text-indigo-600';
+            } else {
+                className += ' bg-white border-gray-300 text-gray-500 hover:bg-gray-50';
+            }
+            
+            btn.className = className;
+            btn.textContent = pageNum;
+            btn.addEventListener('click', () => changePage(pageNum));
+            
+            return btn;
+        }
+        
+        function changePage(pageNum) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (pageNum < 1 || pageNum > totalPages) return;
+            
+            currentPage = pageNum;
+            renderTable();
+        }
+        
+        function changeItemsPerPage(event) {
+            itemsPerPage = parseInt(event.target.value);
+            currentPage = 1;
+            renderTable();
+        }
+        
+        // Table sorting
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                // Toggle direction
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            
+            sortFilteredData();
+            renderTable();
+            
+            // Update sort indicators in table headers
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                const sortField = th.getAttribute('data-sort');
+                const iconElement = th.querySelector('i');
+                
+                if (sortField === currentSort.field) {
+                    iconElement.className = currentSort.direction === 'asc' 
+                        ? 'fas fa-sort-up ml-1' 
+                        : 'fas fa-sort-down ml-1';
+                } else {
+                    iconElement.className = 'fas fa-sort ml-1';
+                }
+            });
+        }
+        
+        function sortFilteredData() {
+            filteredData.sort((a, b) => {
+                let valueA = a[currentSort.field] || '';
+                let valueB = b[currentSort.field] || '';
+                
+                // Special handling for dates
+                if (currentSort.field === 'published' && valueA && valueB) {
+                    valueA = new Date(valueA);
+                    valueB = new Date(valueB);
+                }
+                
+                // Handle numeric values
+                if (typeof valueA === 'number' && typeof valueB === 'number') {
+                    return currentSort.direction === 'asc' ? valueA - valueB : valueB - valueA;
+                }
+                
+                // Handle date values
+                if (valueA instanceof Date && valueB instanceof Date) {
+                    return currentSort.direction === 'asc' ? valueA - valueB : valueB - valueA;
+                }
+                
+                // Handle string values
+                if (typeof valueA === 'string' && typeof valueB === 'string') {
+                    return currentSort.direction === 'asc' 
+                        ? valueA.localeCompare(valueB) 
+                        : valueB.localeCompare(valueA);
+                }
+                
+                // If one is empty, sort emptiness last regardless of direction
+                if (!valueA && valueB) return 1;
+                if (valueA && !valueB) return -1;
+                
+                return 0;
+            });
+        }
+        
+        // Table search
+        function searchTable(event) {
+            searchTerm = event.target.value.trim();
+            applyDesktopFilters();
+        }
+        
+        // Charts initialization and updates
+        function initializeCharts() {
+            // Sector chart
+            const sectorCtx = document.getElementById('sector-chart').getContext('2d');
+            sectorChart = new Chart(sectorCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#4F46E5', '#7C3AED', '#EC4899', '#F59E0B', '#10B981',
+                            '#3B82F6', '#8B5CF6', '#F87171', '#FBBF24', '#34D399',
+                            '#60A5FA', '#A78BFA', '#FB7185', '#FBBF24', '#6EE7B7'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const percentage = Math.round((value / context.dataset.data.reduce((a, b) => a + b, 0)) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // PESTLE chart
+            const pestleCtx = document.getElementById('pestle-chart').getContext('2d');
+            pestleChart = new Chart(pestleCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#4F46E5', '#7C3AED', '#EC4899', '#F59E0B', '#10B981',
+                            '#3B82F6', '#8B5CF6', '#F87171'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Scatter chart (Intensity vs Likelihood)
+            const scatterCtx = document.getElementById('scatter-chart').getContext('2d');
+            scatterChart = new Chart(scatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Insights',
+                        data: [],
+                        backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Intensity'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Likelihood'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = context.raw;
+                                    return [
+                                        `Title: ${dataPoint.title || 'Unknown'}`,
+                                        `Intensity: ${dataPoint.x}`,
+                                        `Likelihood: ${dataPoint.y}`,
+                                        `Sector: ${dataPoint.sector || 'Unknown'}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Timeline chart
+            const timelineCtx = document.getElementById('timeline-chart').getContext('2d');
+            timelineChart = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Insights Count',
+                        data: [],
+                        fill: false,
+                        borderColor: '#4F46E5',
+                        tension: 0.1,
+                        backgroundColor: 'rgba(79, 70, 229, 0.5)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateCharts();
+        }
+        
+        function updateCharts() {
+            updateSectorChart();
+            updatePestleChart();
+            updateScatterChart();
+            updateTimelineChart();
+        }
+        
+        function updateSectorChart() {
+            const sectors = {};
+            filteredData.forEach(item => {
+                if (item.sector) {
+                    sectors[item.sector] = (sectors[item.sector] || 0) + 1;
+                } else {
+                    sectors['Unknown'] = (sectors['Unknown'] || 0) + 1;
+                }
+            });
+            
+            // Sort sectors by count (descending)
+            const sortedSectors = Object.entries(sectors)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10); // Top 10 sectors
+            
+            sectorChart.data.labels = sortedSectors.map(item => item[0]);
+            sectorChart.data.datasets[0].data = sortedSectors.map(item => item[1]);
+            sectorChart.update();
+        }
+        
+        function updatePestleChart() {
+            const pestles = {};
+            filteredData.forEach(item => {
+                if (item.pestle) {
+                    pestles[item.pestle] = (pestles[item.pestle] || 0) + 1;
+                } else {
+                    pestles['Unknown'] = (pestles['Unknown'] || 0) + 1;
+                }
+            });
+            
+            pestleChart.data.labels = Object.keys(pestles);
+            pestleChart.data.datasets[0].data = Object.values(pestles);
+            pestleChart.update();
+        }
+        
+        function updateScatterChart() {
+            const scatterData = filteredData
+                .filter(item => item.intensity && item.likelihood)
+                .map(item => ({
+                    x: item.intensity,
+                    y: item.likelihood,
+                    title: item.title,
+                    sector: item.sector,
+                    topic: item.topic
+                }));
+            
+            scatterChart.data.datasets[0].data = scatterData;
+            scatterChart.update();
+        }
+        
+        function updateTimelineChart() {
+            // Group by month
+            const timeData = {};
+            filteredData.forEach(item => {
+                if (item.published) {
+                    const month = moment(item.published).format('YYYY-MM');
+                    timeData[month] = (timeData[month] || 0) + 1;
+                }
+            });
+            
+            // Sort chronologically
+            const sortedTimeData = Object.entries(timeData)
+                .sort((a, b) => a[0].localeCompare(b[0]));
+            
+            timelineChart.data.labels = sortedTimeData.map(item => moment(item[0]).format('MMM YYYY'));
+            timelineChart.data.datasets[0].data = sortedTimeData.map(item => item[1]);
+            timelineChart.update();
+        }
+        
+        // Mock API endpoint (for testing)
+        if (typeof window.fetch !== 'function') {
+            window.fetch = function(url) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        if (url === '/api/data') {
+                            resolve({
+                                json: () => Promise.resolve([
+                                    {
+                                        title: "Solar power capacity to be increased",
+                                        sector: "Energy",
+                                        topic: "Renewable Energy",
+                                        insight: "Global solar power capacity is expected to increase by 25% in 2023",
+                                        region: "Global",
+                                        pestle: "Technological",
+                                        intensity: 8,
+                                        likelihood: 9,
+                                        published: "2024-09-15"
+                                    },
+                                    {
+                                        title: "Semiconductor shortage impacting automotive industry",
+                                        sector: "Manufacturing",
+                                        topic: "Supply Chain",
+                                        insight: "Semiconductor shortages continue to delay vehicle production globally",
+                                        region: "Global",
+                                        pestle: "Economic",
+                                        intensity: 7,
+                                        likelihood: 8,
+                                        published: "2024-09-10"
+                                    },
+                                    {
+                                        title: "AI regulation in EU taking shape",
+                                        sector: "Technology",
+                                        topic: "Artificial Intelligence",
+                                        insight: "New AI regulations in the EU will impact how companies develop and deploy AI systems",
+                                        region: "Europe",
+                                        pestle: "Political",
+                                        intensity: 6,
+                                        likelihood: 9,
+                                        published: "2024-09-20"
+                                    },
+                                    {
+                                        title: "Remote work policies becoming permanent",
+                                        sector: "Business",
+                                        topic: "Workplace",
+                                        insight: "Major companies announcing permanent hybrid or remote work policies post-pandemic",
+                                        region: "North America",
+                                        pestle: "Social",
+                                        intensity: 5,
+                                        likelihood: 9,
+                                        published: "2024-08-30"
+                                    },
+                                    {
+                                        title: "Healthcare spending increase",
+                                        sector: "Healthcare",
+                                        topic: "Medical Technology",
+                                        insight: "Global healthcare spending projected to rise 6% annually over next five years",
+                                        region: "Global",
+                                        pestle: "Economic",
+                                        intensity: 7,
+                                        likelihood: 8,
+                                        published: "2024-09-05"
+                                    },
+                                    {
+                                        title: "Extreme weather events disrupt agriculture",
+                                        sector: "Agriculture",
+                                        topic: "Climate Change",
+                                        insight: "Increasing frequency of extreme weather events affecting crop yields worldwide",
+                                        region: "Global",
+                                        pestle: "Environmental",
+                                        intensity: 8,
+                                        likelihood: 9,
+                                        published: "2024-08-15"
+                                    },
+                                    {
+                                        title: "Quantum computing breakthrough",
+                                        sector: "Technology",
+                                        topic: "Quantum Computing",
+                                        insight: "Major advancement in error correction brings practical quantum computing closer to reality",
+                                        region: "North America",
+                                        pestle: "Technological",
+                                        intensity: 7,
+                                        likelihood: 6,
+                                        published: "2024-09-25"
+                                    },
+                                    {
+                                        title: "Shift to sustainable packaging",
+                                        sector: "Retail",
+                                        topic: "Sustainability",
+                                        insight: "Major retailers committing to 100% recyclable or compostable packaging by 2025",
+                                        region: "Global",
+                                        pestle: "Environmental",
+                                        intensity: 6,
+                                        likelihood: 8,
+                                        published: "2024-07-10"
+                                    },
+                                    {
+                                        title: "5G infrastructure expansion",
+                                        sector: "Telecommunications",
+                                        topic: "Infrastructure",
+                                        insight: "Global 5G infrastructure spending expected to double by 2025",
+                                        region: "Global",
+                                        pestle: "Technological",
+                                        intensity: 7,
+                                        likelihood: 9,
+                                        published: "2024-08-20"
+                                    },
+                                    {
+                                        title: "Cybersecurity concerns rising",
+                                        sector: "Technology",
+                                        topic: "Cybersecurity",
+                                        insight: "Ransomware attacks increased 150% in the past year",
+                                        region: "Global",
+                                        pestle: "Technological",
+                                        intensity: 9,
+                                        likelihood: 9,
+                                        published: "2024-09-30"
+                                    }
+                                ])
+                            });
+                        }
+                    }, 500);
+                });
+            };
+        }
+    </script>
+</body>
+</html>
